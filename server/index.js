@@ -1,23 +1,54 @@
-import express from "express"
+import express from "express";
 import mongoose from "mongoose";
 import conn from "./models/database.js/";
 import cors from "cors";
+import bodyParser from "body-parser";
+import session from "express-session";
+import passport from "passport";
+import LocalStrategy from "passport-local";
+import passportLocalMongoose from "passport-local-mongoose";
 
 const app=express();
-
+app.use(express.static("/public"));
 app.use(cors());
+app.use(bodyParser.urlencoded({extended:true}));
+app.use(bodyParser.json());
+
+app.use(session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    maxAge : 1000*60*60*24*10
+  }))
+app.use(passport.initialize());
+app.use(passport.session());
 
 const TTSSchema=new mongoose.Schema({
     name: String,
-    email: String,
+    username: String,
     password:String
 });
-
+TTSSchema.plugin(passportLocalMongoose);
 const User=mongoose.model("User", TTSSchema);
 
 
-// Routes
+passport.use(new LocalStrategy(User.authenticate()));
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
 
-app.post("/login",(req,res)=> console.log("Posted Successfully"));
+app.post('/login', passport.authenticate('local'), function(req, res) {
+    res.sendStatus(200);
+  });
+app.post("/signup",(req,res)=>{
+    User.register(new User({name:req.body.name,username: req.body.username}),req.body.password,function(err,user){
+            if(err){
+                console.log(err);
+            }
+            else{
+                res.sendStatus(200);
+            }
+        });
+        
+});
 
-app.listen(5000,console.log("Server started on port 5000"));
+app.listen(5000,console.log("Server Started"));

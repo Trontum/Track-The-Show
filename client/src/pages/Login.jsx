@@ -2,19 +2,23 @@ import { Link } from "react-router-dom";
 import TitleAndCaption from "../Components/TitleAndCaption";
 import { useState } from "react";
 import axios from "axios";
-
+import { useNavigate } from "react-router-dom";
 
 function Login(){
+    const navigate=useNavigate();
     const [userEmail, setUserEmail]=useState("");
     const [userPassword, setUserPassword]=useState("");
     async function sendUserData(e){
         e.preventDefault();
         try{
             const resp=await axios.post("http://localhost:5000/login",{
-                email: userEmail,
+                username: userEmail,
                 password: userPassword
             });
-            console.log(resp);
+            if(resp.data==="OK"){
+                navigate("/user");
+            }
+            
         }
         catch(err){
             console.error(err);
