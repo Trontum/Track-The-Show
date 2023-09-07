@@ -7,6 +7,7 @@ import session from "express-session";
 import passport from "passport";
 import LocalStrategy from "passport-local";
 import passportLocalMongoose from "passport-local-mongoose";
+import "dotenv/config";
 
 const app=express();
 app.use(express.static("/public"));
@@ -18,7 +19,8 @@ app.use(session({
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
-    maxAge : 1000*60*60*24*10
+    cookie: { secure: true,
+        maxAge : 1000*60 }
   }))
 app.use(passport.initialize());
 app.use(passport.session());
@@ -49,6 +51,15 @@ app.post("/signup",(req,res)=>{
             }
         });
         
+});
+
+app.get("/logout",(req,res)=>{
+    req.logout(function(err){
+        if(err){
+            console.log(err);   
+        }
+    });
+    res.sendStatus(200);
 });
 
 app.listen(5000,console.log("Server Started"));

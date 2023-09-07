@@ -8,6 +8,7 @@ function Login(){
     const navigate=useNavigate();
     const [userEmail, setUserEmail]=useState("");
     const [userPassword, setUserPassword]=useState("");
+
     async function sendUserData(e){
         e.preventDefault();
         try{
@@ -16,7 +17,8 @@ function Login(){
                 password: userPassword
             });
             if(resp.data==="OK"){
-                navigate("/user");
+                window.localStorage.setItem("isAuthenticated",true);
+                navigate("/explore");
             }
             
         }

@@ -16,7 +16,8 @@ function SignUp(){
                 password: userPassword
             });
             if(resp.data==="OK"){
-                navigate("/user");
+                console.log("successful");
+                navigate("/explore");
             }
         }
         catch(err){
